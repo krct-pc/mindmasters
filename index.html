@@ -120,13 +120,13 @@
     const QUESTIONS_DATA_ROUND_2 = [
         {
             id: 6, round: 2,
-            title: "Puzzle 6: Object Recall (Visual Memory)",
+            title: "Puzzle 6: Object Recall (Visual Memory - Scene 1)",
             type: "object_recall", isManual: true, // Manual timing
             prompt: "Write down the names of the objects you saw in the image.",
         },
         {
             id: 7, round: 2,
-            title: "Puzzle 7: Object Recall (Position & Detail)",
+            title: "Puzzle 7: Object Recall (Position & Detail - Scene 2)",
             type: "object_recall", isManual: true, // Manual timing
             prompt: "What color was the top-left object? / What object was in the center?",
         },
@@ -138,14 +138,14 @@
         },
         {
             id: 9, round: 2,
-            title: "Puzzle 9: Find the Killer - Scenario A",
+            title: "Puzzle 9: Find the __EVENTRA____ - Scenario A (Single Image)",
             type: "killer_scenario", isManual: true, // Manual timing
             prompt: "Based on the four visual clues, which suspect committed the crime?",
             panels: ['Clue 1: Footprints on Mud', 'Clue 2: Missing Button', 'Clue 3: Torn Note', 'Clue 4: Suspect Alibis'], 
         },
         {
             id: 10, round: 2,
-            title: "Puzzle 10: Find the Killer - Scenario B",
+            title: "Puzzle 10: Find the EVENTRA - Scenario B (Single Image)",
             type: "killer_scenario", isManual: true, // Manual timing
             prompt: "Identify the critical sequence of events that led to the solution.",
             panels: ['Clue 1: Broken Glass', 'Clue 2: Time of Day', 'Clue 3: Witness Account', 'Clue 4: The Weapon'],
@@ -178,7 +178,7 @@
 
     // --- State Management ---
     // Added 'selection' state for the new intermediate page
-    let currentState = 'start'; // 'start', 'selection', 'password2', 'password3', 'round1', 'round2', 'round3', 'end'
+    let currentState = 'start'; // 'start', 'selection', 'password1', 'password2', 'password3', 'round1', 'round2', 'round3', 'end'
     let currentRound = 1;
     let currentQuestionIndex = 0;
     let timerInstance = null;
@@ -251,7 +251,7 @@
                 </h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-10 w-full max-w-6xl">
-                    <button onclick="changeState('round1')" 
+                    <button onclick="changeState('password1')" 
                         class="btn-primary flex flex-col items-center px-10 py-8 bg-green-600 text-white text-3xl font-bold rounded-xl shadow-2xl shadow-green-700/50 hover:bg-green-700 transition duration-300 transform hover:scale-105 uppercase tracking-wider border-4 border-green-300">
                         <span class="text-4xl mb-2">Round 1</span>
                         <span class="text-xl font-light opacity-80">(Rapid Recall)</span>
@@ -397,13 +397,13 @@
                     <div class="flex-1 flex flex-col items-center p-2 bg-gray-900 rounded-xl shadow-inner border-2 border-gray-700 min-w-[45%]">
                         <p class="text-2xl font-bold mb-2 text-indigo-400 uppercase tracking-wider">IMAGE A</p>
                         <!-- Dummy Image Path for Scene A -->
-                        <img src="https://placehold.co/550x400/555555/ffffff?text=SCENE+A" class="rounded-lg shadow-xl border-4 border-gray-600 w-full h-auto object-contain" alt="Scene A for Spot the Difference"/>
+                        <img src="/images/spota.jpg" class="rounded-lg shadow-xl border-4 border-gray-600 w-full h-auto object-contain" alt="Scene A for Spot the Difference"/>
                     </div>
                     <!-- Image B Container -->
                     <div class="flex-1 flex flex-col items-center p-2 bg-gray-900 rounded-xl shadow-inner border-2 border-gray-700 min-w-[45%]">
                         <p class="text-2xl font-bold mb-2 text-indigo-400 uppercase tracking-wider">IMAGE B</p>
                         <!-- Dummy Image Path for Scene B -->
-                        <img src="https://placehold.co/550x400/666666/ffffff?text=SCENE+B" class="rounded-lg shadow-xl border-4 border-gray-600 w-full h-auto object-contain" alt="Scene B for Spot the Difference"/>
+                        <img src="/images/spotb.jpg" class="rounded-lg shadow-xl border-4 border-gray-600 w-full h-auto object-contain" alt="Scene B for Spot the Difference"/>
                     </div>
                 </div>
             `;
@@ -420,15 +420,20 @@
             `;
         }
 
-        // --- ROUND 2 TYPES (Updated with DUMMY VIDEO PATH) ---
+        // --- ROUND 2 TYPES (Q6 & Q7: SEPARATE IMAGES) ---
         if (data.type === 'object_recall') {
+            // Differentiate Q6 and Q7 visual placeholders
+            const imageText = data.id === 6 ? 'OBJECT+RECALL+SCENE+1' : 'OBJECT+RECALL+SCENE+2';
+            const borderColor = data.id === 6 ? 'border-green-500' : 'border-purple-500';
+            const promptText = data.id === 6 ? 'MEMORIZE ALL OBJECTS, COLORS, AND POSITIONS' : 'FOCUS ON POSITIONS AND DETAILS';
+
              return `
                 <div class="w-full flex flex-col items-center">
-                    <p class="text-3xl text-yellow-400 mb-6 font-semibold">MEMORIZE ALL OBJECTS, COLORS, AND POSITIONS</p>
+                    <p class="text-3xl text-yellow-400 mb-6 font-semibold">${promptText}</p>
                     <!-- Visual Memory Image Placeholder -->
-                    <img src="https://github.com/krct-pc/mindmasters/blob/main/images/hel.jpg?raw=true"
-                         class="w-full max-w-4xl rounded-xl border-8 border-solid border-green-500 shadow-xl h-auto object-contain aspect-video" 
-                         alt="Object Recall Visual for Memory Puzzle"
+                    <img src="/images/OBJ2.jpg" 
+                         class="w-full max-w-4xl rounded-xl border-8 border-solid ${borderColor} shadow-xl h-auto object-contain aspect-video" 
+                         alt="Object Recall Visual for Memory Puzzle ${data.id}"
                     />
                 </div>
             `;
@@ -453,20 +458,23 @@
                 </div>
             `;
         }
-        // Updated layout to 2x2 grid for "Find the Killer" scenarios with dummy image paths
+        // --- Q9 & Q10: SINGLE IMAGE SCENARIO (Removed Grid) ---
         if (data.type === 'killer_scenario') {
+            const imageText = data.id === 9 ? 'FIND+THE+' : 'FIND+THE+';
+            const borderColor = data.id === 9 ? 'border-red-500' : 'border-blue-500';
+            const clueText = data.panels.map(p => p.split(': ')[1]).join(' | ');
+
             return `
-                <div class="grid grid-cols-2 gap-6 w-full max-w-6xl mx-auto">
-                    ${data.panels.map((clue, index) => `
-                        <div class="visual-item flex flex-col items-center justify-between h-72 bg-gray-700 rounded-xl p-4 text-center border-4 border-indigo-400 shadow-xl">
-                            <p class="text-2xl font-bold text-yellow-400 mb-2">CLUE ${index + 1}: ${clue}</p>
-                            <!-- Dummy Image Path for Clue -->
-                            <img src="https://placehold.co/400x200/223344/ffffff?text=CLUE+${index + 1}+IMAGE" 
-                                class="w-full h-auto rounded-md object-cover flex-grow border-4 border-indigo-300"
-                                alt="Clue Image ${index + 1} for Deduction Puzzle"
-                            />
-                        </div>
-                    `).join('')}
+                <div class="w-full flex flex-col items-center text-center">
+                    <p class="text-3xl text-yellow-400 mb-6 font-semibold">ANALYZE THE SINGLE SCENE IMAGE CAREFULLY</p>
+                    <!-- Single Image Placeholder for  Scenario -->
+                    <img src="/images/OBJ3.jpg" 
+                         class="w-full max-w-6xl rounded-xl border-8 border-solid ${borderColor} shadow-xl h-auto object-contain" 
+                         alt="Single Scene for Killer Scenario ${data.id}"
+                    />
+                    <div class="mt-8 text-2xl font-medium text-gray-300 px-4 py-3 bg-gray-700 rounded-lg max-w-4xl">
+                        **Clues to Focus On:** ${clueText}
+                    </div>
                 </div>
             `;
         }
@@ -672,6 +680,9 @@
             case 'selection': // New state for round selection
                 renderRoundSelectionScreen();
                 break;
+            case 'password1': // NEW: Round 1 requires password
+                renderPasswordScreen(1);
+                break;
             case 'password2':
                 renderPasswordScreen(2);
                 break;
@@ -679,7 +690,7 @@
                 renderPasswordScreen(3);
                 break;
             case 'round1':
-                currentRound = 1;
+                currentRound = 1; 
                 renderRoundScreen();
                 break;
             case 'round2':
